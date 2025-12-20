@@ -1,37 +1,30 @@
 #include <iostream>
 #include <vector>
-#include <unordered_map>
 #include <algorithm> // For max
 
 using namespace std;
 
 class Solution {
 public:
-    int maximumUniqueSubarray(vector<int>& nums) {
-        int n = nums.size();
-        int i = 0, j = 0;
-        int sum = 0;
-        int maxSum = 0;
+    int longestSubarray(vector<int>& nums) {
+        int left = 0, zeroes = 0, maxlen = 0;
 
-        unordered_map<int, int> mpp;
+        for(int right = 0 ; right < nums.size() ; right++){
+            if(nums[right] == 0) zeroes++;
 
-        while(j < n){
-            // Add current element to the window
-            mpp[nums[j]]++;
-            sum += nums[j];
-
-            // If duplicate found, shrink window from left until duplicate is removed
-            while(mpp[nums[j]] > 1){
-                mpp[nums[i]]--;
-                sum -= nums[i];
-                i++;
+            // Shrink window if we have more than 1 zero
+            while(zeroes > 1){
+                if(nums[left] == 0) zeroes--;
+                left++;
             }
-            
-            // Update max sum found so far
-            maxSum = max(sum, maxSum);
-            j++;
+
+            // Calculate length
+            // Normally window size is (right - left + 1).
+            // But we MUST delete exactly one element.
+            // So the length of 1s is (right - left + 1) - 1 = (right - left).
+            maxlen = max(maxlen, right - left);
         }
-        return maxSum;
+       return maxlen;
     }
 };
 
@@ -39,28 +32,25 @@ int main() {
     Solution sol;
 
     // Test Case 1: Standard Example
-    // nums = [4,2,4,5,6]
-    // Subarrays: [4,2], [2,4,5,6] (sum 17). 
-    // The duplicate 4 forces the window to reset past the first 4.
-    vector<int> nums1 = {4, 2, 4, 5, 6};
-    
-    cout << "Test Case 1:" << endl;
-    cout << "Input: [ ";
-    for(int n : nums1) cout << n << " ";
-    cout << "]" << endl;
-    cout << "Maximum Unique Subarray Sum: " << sol.maximumUniqueSubarray(nums1) << endl;
+    // [1,1,0,1] -> delete the 0 -> [1,1,1] -> length 3
+    vector<int> nums1 = {1, 1, 0, 1};
+    cout << "Test Case 1: [1, 1, 0, 1]" << endl;
+    cout << "Result: " << sol.longestSubarray(nums1) << endl;
     cout << "-----------------" << endl;
 
-    // Test Case 2: Many duplicates
-    // nums = [5,2,1,2,5,2,1,2,5]
-    // Max should be [5,2,1] (8) or [1,2,5] (8).
-    vector<int> nums2 = {5, 2, 1, 2, 5, 2, 1, 2, 5};
+    // Test Case 2: All 1s
+    // [1,1,1] -> Must delete one element -> [1,1] -> length 2
+    vector<int> nums2 = {1, 1, 1};
+    cout << "Test Case 2: [1, 1, 1]" << endl;
+    cout << "Result: " << sol.longestSubarray(nums2) << endl;
+    cout << "-----------------" << endl;
 
-    cout << "Test Case 2:" << endl;
-    cout << "Input: [ ";
-    for(int n : nums2) cout << n << " ";
-    cout << "]" << endl;
-    cout << "Maximum Unique Subarray Sum: " << sol.maximumUniqueSubarray(nums2) << endl;
+    // Test Case 3: Multiple zeros
+    // [0,1,1,1,0,1,1,0,1]
+    // Best is [1,1,1,0,1,1] -> delete 0 -> length 5
+    vector<int> nums3 = {0, 1, 1, 1, 0, 1, 1, 0, 1};
+    cout << "Test Case 3: [0, 1, 1, 1, 0, 1, 1, 0, 1]" << endl;
+    cout << "Result: " << sol.longestSubarray(nums3) << endl;
 
     return 0;
 }
