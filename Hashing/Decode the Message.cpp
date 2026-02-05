@@ -4,7 +4,6 @@
 #include <vector>
 
 using namespace std;
-// my approach
 class Solution {
 public:
     string decodeMessage(string key, string message) {
